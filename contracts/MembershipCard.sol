@@ -10,13 +10,22 @@ contract MembershipCard is ERC721, ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
+    uint256 public intervals;
+    // Distribution
+    mapping(uint256 => uint256) public cardStakes;
+    CardTier[] public tiers;
 
     constructor(
         string memory _tokenName,
         string memory _tokenSymbol,
-        address multisig
+        address multisig,
+        string[] memory _tierNames,
+        uint256[] memory _thresholds
     ) ERC721(_tokenName, _tokenSymbol) {
         transferOwnership(multisig);
+        for (uint256 index = 0; index < _tierNames.length; index++) {
+            tiers[index] = CardTier(_tierNames[index], _thresholds[index]);
+        }
     }
 
     function safeMint(address to) public payable {
@@ -40,4 +49,9 @@ contract MembershipCard is ERC721, ERC721Enumerable, Ownable {
     {
         return super.supportsInterface(interfaceId);
     }
+}
+
+struct CardTier {
+    string name;
+    uint256 threshold;
 }
