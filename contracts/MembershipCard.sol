@@ -72,7 +72,7 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     function claimBanana(uint256 _cardId) public {
         //TODO: Claim banana function
         require(msg.sender == ownerOf(_cardId), "NotOwner");
-        uint256 unclaimedBananas = cardBalances[_cardId] *
+        uint256 unclaimedBananas = getCardPoints(_cardId) *
             (bananaRewards - rewardSnapshots[_cardId]);
         if (unclaimedBananas > 0) {
             rewardSnapshots[_cardId] = bananaRewards;
