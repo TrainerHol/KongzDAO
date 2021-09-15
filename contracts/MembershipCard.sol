@@ -6,12 +6,14 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "./Interfaces/Banana.sol";
 
 contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
     uint256 public constant interval = 1 * 10**17;
+    Banana bananaContract;
     // Distribution
     mapping(uint256 => uint256) public cardBalances;
     mapping(uint256 => uint256) rewardSnapshots;
@@ -21,6 +23,7 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     CardTier[] public tiers;
 
     constructor(
+        address _bananaContract,
         string memory _tokenName,
         string memory _tokenSymbol,
         address multisig,
@@ -29,6 +32,7 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     ) ERC721(_tokenName, _tokenSymbol) {
         transferOwnership(multisig);
         setTiers(_tierNames, _thresholds);
+        bananaContract = Banana(_bananaContract);
     }
 
     function setTiers(string[] memory _tierNames, uint256[] memory _thresholds)
@@ -67,6 +71,13 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
 
     function claimBanana(uint256 _cardId) public {
         //TODO: Claim banana function
+        require(msg.sender == ownerOf(_cardId), "NotOwner");
+        uint256 unclaimedBananas = cardBalances[_cardId] *
+            (bananaRewards - rewardSnapshots[_cardId]);
+        if (unclaimedBananas > 0) {
+            rewardSnapshots[_cardId] = bananaRewards;
+            bananaContract.transfer(msg.sender, unclaimedBananas);
+        }
     }
 
     function _beforeTokenTransfer(
