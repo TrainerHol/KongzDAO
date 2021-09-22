@@ -138,6 +138,10 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         return metadata;
     }
 
+    function withdrawFunds() public onlyOwner {
+        (payable(msg.sender)).transfer(balanceOf(address(this)));
+    }
+
     function _burn(uint256 tokenId)
         internal
         override(ERC721, ERC721URIStorage)
