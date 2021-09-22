@@ -7,9 +7,12 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./Interfaces/Banana.sol";
+import "./Helpers/StructureHelpers.sol";
 
 contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
+    using StructureHelpers for string;
+    using StructureHelpers for uint256;
 
     Counters.Counter private _tokenIdCounter;
     uint256 public constant interval = 1 * 10**17;
@@ -21,6 +24,11 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     uint256 bananaRewards;
     uint256 bananaChange;
     CardTier[] public tiers;
+    // Metadata
+    string imageAPI;
+    string animationAPI;
+    string constant description = "Kongz DAO Membership Card";
+    string constant external_url = "https://www.kongzdao.com";
 
     constructor(
         address _bananaContract,
@@ -28,11 +36,15 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         string memory _tokenSymbol,
         address multisig,
         string[] memory _tierNames,
-        uint256[] memory _thresholds
+        uint256[] memory _thresholds,
+        string memory _imageAPI,
+        string memory _animationAPI
     ) ERC721(_tokenName, _tokenSymbol) {
         transferOwnership(multisig);
         setTiers(_tierNames, _thresholds);
         bananaContract = Banana(_bananaContract);
+        imageAPI = _imageAPI;
+        animationAPI = _animationAPI;
     }
 
     function setTiers(string[] memory _tierNames, uint256[] memory _thresholds)
@@ -70,7 +82,6 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     }
 
     function claimBanana(uint256 _cardId) public {
-        //TODO: Claim banana function
         require(msg.sender == ownerOf(_cardId), "NotOwner");
         uint256 unclaimedBananas = getCardPoints(_cardId) *
             (bananaRewards - rewardSnapshots[_cardId]);
@@ -104,7 +115,27 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         returns (string memory)
     {
         // TODO: Dynamic metadata
-        return super.tokenURI(tokenId);
+        string memory metadata = "{\n";
+        string memory nameProp = string(
+            abi.encodePacked("KDMC #", tokenId.toString())
+        );
+        metadata.propertyConcat("name", nameProp);
+        metadata.propertyConcat("description", description);
+        string memory imageProp = string(
+            abi.encodePacked(imageAPI, tokenId.toString())
+        );
+        metadata.propertyConcat("image", imageProp);
+        string memory animProp = string(
+            abi.encodePacked(animationAPI, tokenId.toString())
+        );
+        metadata.propertyConcat("animation_url", animProp);
+        string memory attributes = '{ "attributes": [ {';
+        attributes.propertyConcat("trait_type", "Points");
+        attributes.propertyConcat("value", getCardPoints(tokenId).toString());
+        attributes = string(abi.encodePacked(attributes, "} ] }\n"));
+        metadata.propertyConcat("external_link", external_url, true);
+        metadata = string(abi.encodePacked(metadata, "\n}"));
+        return metadata;
     }
 
     function _burn(uint256 tokenId)
