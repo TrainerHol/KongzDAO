@@ -39,4 +39,5 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
+func.id = "deploy_membershipcard";
 func.tags = ["MembershipCard"];
