@@ -12,7 +12,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
    *  Replace the empty values with the ones you want when deploying!
    *  Card tiers and value for thresholds can be changed, too.
    */
-  const _bananaContract = ""; // The address of the banana ERC-20 contract
+  const _bananaContract = "0xE2311ae37502105b442bBef831E9b53c5d2e9B3b"; // The address of the banana ERC-20 contract
   const _tokenName = "KongzDAO Membership Card";
   const _tokenSymbol = "KDMC";
   const _multisig = ""; // Multisig address
@@ -31,6 +31,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
   await deploy("MembershipCard", {
+    contract: "MembershipCard",
     from: deployer,
     args: [_bananaContract, _tokenName, _tokenSymbol, _multisig, _tierNames, _thresholds, _imageAPI, _animationAPI],
     log: true,
