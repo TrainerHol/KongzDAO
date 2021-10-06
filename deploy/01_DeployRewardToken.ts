@@ -7,16 +7,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   console.log({ live: hre.network.live });
 
+  const { deployer } = await getNamedAccounts();
   /* Contract Parameters
    *  Replace the empty values with the ones you want when deploying!
    *  Card tiers and value for thresholds can be changed, too.
    */
   const _tokenName = "KongzDAO Reward Token";
   const _tokenSymbol = "KDRT";
-  const _multisig = ""; // Multisig address
+  const _multisig = deployer; // Multisig address
   const _membershipContract = deployments.get("MembershipCard");
-
-  const { deployer } = await getNamedAccounts();
 
   await deploy("RewardToken", {
     contract: "RewardToken",
