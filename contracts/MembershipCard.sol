@@ -35,23 +35,27 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         string memory _tokenName,
         string memory _tokenSymbol,
         address multisig,
-        string[] memory _tierNames,
+        bytes32[] memory _tierNames,
         uint256[] memory _thresholds,
         string memory _imageAPI,
         string memory _animationAPI
     ) ERC721(_tokenName, _tokenSymbol) {
-        transferOwnership(multisig);
         setTiers(_tierNames, _thresholds);
+        transferOwnership(multisig);
         bananaContract = Banana(_bananaContract);
         imageAPI = _imageAPI;
         animationAPI = _animationAPI;
     }
 
-    function setTiers(string[] memory _tierNames, uint256[] memory _thresholds)
-        internal
+    function setTiers(bytes32[] memory _tierNames, uint256[] memory _thresholds)
+        public
+        onlyOwner
     {
         for (uint256 index = 0; index < _tierNames.length; index++) {
-            tiers[index] = CardTier(_tierNames[index], _thresholds[index]);
+            tiers[index] = CardTier("", 0);
+            CardTier storage card = tiers[index];
+            card.name = _tierNames[index];
+            card.threshold = _thresholds[index];
         }
     }
 
@@ -155,6 +159,6 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
 }
 
 struct CardTier {
-    string name;
+    bytes32 name;
     uint256 threshold;
 }
