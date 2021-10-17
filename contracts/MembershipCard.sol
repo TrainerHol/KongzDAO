@@ -23,7 +23,8 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     uint256 currentBalances;
     uint256 bananaRewards;
     uint256 bananaChange;
-    CardTier[] public tiers;
+    mapping(uint256 => string) public tierNames;
+    mapping(uint256 => uint256) public tierThresholds;
     // Metadata
     string imageAPI;
     string animationAPI;
@@ -35,7 +36,7 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         string memory _tokenName,
         string memory _tokenSymbol,
         address multisig,
-        bytes32[] memory _tierNames,
+        string[] memory _tierNames,
         uint256[] memory _thresholds,
         string memory _imageAPI,
         string memory _animationAPI
@@ -47,15 +48,13 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         animationAPI = _animationAPI;
     }
 
-    function setTiers(bytes32[] memory _tierNames, uint256[] memory _thresholds)
+    function setTiers(string[] memory _tierNames, uint256[] memory _thresholds)
         public
         onlyOwner
     {
-        for (uint256 index = 0; index < _tierNames.length; index++) {
-            tiers[index] = CardTier("", 0);
-            CardTier storage card = tiers[index];
-            card.name = _tierNames[index];
-            card.threshold = _thresholds[index];
+        for (uint256 index = 0; index < _thresholds.length; index++) {
+            tierNames[index] = _tierNames[index];
+            tierThresholds[index] = _thresholds[index];
         }
     }
 
@@ -156,9 +155,4 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     {
         super._burn(tokenId);
     }
-}
-
-struct CardTier {
-    bytes32 name;
-    uint256 threshold;
 }

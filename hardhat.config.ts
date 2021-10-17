@@ -14,7 +14,6 @@ const config: HardhatUserConfig = {
       forking: {
         url: process.env.ALCHEMY_MAINNET_RPC_URL + "",
       },
-      gasPrice: 30,
       chainId: 1337,
     },
     // kovan: {

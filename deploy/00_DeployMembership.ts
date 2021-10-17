@@ -8,7 +8,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const { utils } = ethers;
 
-  console.log({ live: hre.network.live });
+  //console.log({ live: hre.network.live });
 
   const { deployer } = await getNamedAccounts();
   /* Contract Parameters
@@ -20,7 +20,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const _tokenSymbol = "KDMC";
   const _multisig = deployer; // Multisig address
   // Tier names of the cards, must be the same number as the thresholds!
-  const _tierNames = [utils.hexlify(utils.formatBytes32String("Bronze")), utils.hexlify(utils.formatBytes32String("Silver")), utils.hexlify(utils.formatBytes32String("Gold")), utils.hexlify(utils.formatBytes32String("Platinum")), utils.hexlify(utils.formatBytes32String("Diamond"))];
+  const _tierNames = ["Bronze", "Silver", "Gold", "Platinum", "Diamond"];
   const _thresholds = [
     parseUnits("0.1"), // Bronze
     parseUnits("1.0"), // Silver
