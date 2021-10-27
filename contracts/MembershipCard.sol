@@ -23,8 +23,8 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     uint256 currentBalances;
     uint256 bananaRewards;
     uint256 bananaChange;
-    mapping(uint256 => string) public tierNames;
-    mapping(uint256 => uint256) public tierThresholds;
+    string[] public tierNames;
+    uint256[] public tierThresholds;
     // Metadata
     string imageAPI;
     string animationAPI;
@@ -52,9 +52,11 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         public
         onlyOwner
     {
+        delete tierNames;
+        delete tierThresholds;
         for (uint256 index = 0; index < _thresholds.length; index++) {
-            tierNames[index] = _tierNames[index];
-            tierThresholds[index] = _thresholds[index];
+            tierNames.push(_tierNames[index]);
+            tierThresholds.push(_thresholds[index]);
         }
     }
 
@@ -147,6 +149,15 @@ contract MembershipCard is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     {
         require(_amount < balanceOf(address(this)), "Not enough funds");
         _to.transfer(_amount);
+    }
+
+    function getTiers()
+        external
+        view
+        returns (string[] memory names, uint256[] memory thresholds)
+    {
+        names = tierNames;
+        thresholds = tierThresholds;
     }
 
     function _burn(uint256 tokenId)

@@ -17,7 +17,13 @@ describe("Membership Contract", function () {
   });
 
   it("Should have the tier names set", async function () {
-    const tierSize = await membership.tierNames(4);
-    expect(tierSize).to.equal("Diamond");
+    const tierName = await membership.tierNames(4);
+    expect(tierName).to.equal("Diamond");
+  });
+
+  it("Should return the array of tiers", async function () {
+    const tierSize = await membership.getTiers();
+    expect(tierSize.names.length).to.equal(5);
+    expect(tierSize.thresholds.length).to.equal(5);
   });
 });
